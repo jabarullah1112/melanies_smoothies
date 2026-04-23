@@ -1,8 +1,20 @@
 import streamlit as st
-from snowflake.snowpark.context import get_active_session
-from snowflake.snowpark.functions import col
 
-session = get_active_session()
+import streamlit as st
+from snowflake.snowpark import Session
+
+connection_parameters = {
+    "account": "<your_account>",
+    "user": "<your_username>",
+    "password": "<your_password>",
+    "role": "SYSADMIN",
+    "warehouse": "COMPUTE_WH",
+    "database": "SMOOTHIES",
+    "schema": "PUBLIC"
+}
+
+session = Session.builder.configs(connection_parameters).create()
+
 
 # 👇 Name input
 name_on_order = st.text_input("Enter your name")
