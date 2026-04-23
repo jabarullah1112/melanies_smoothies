@@ -3,15 +3,7 @@ import streamlit as st
 import streamlit as st
 from snowflake.snowpark import Session
 
-connection_parameters = {
-    "account": "<your_account>",
-    "user": "<your_username>",
-    "password": "<your_password>",
-    "role": "SYSADMIN",
-    "warehouse": "COMPUTE_WH",
-    "database": "SMOOTHIES",
-    "schema": "PUBLIC"
-}
+
 
 session = Session.builder.configs(connection_parameters).create()
 
