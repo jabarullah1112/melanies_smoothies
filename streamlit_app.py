@@ -28,7 +28,7 @@ ingredients_list = st.multiselect("Choose fruits", fruit_name_list)
 
 
 
-st.write("Final string:", ingredients_string)
+
 
 
 order_filled = st.checkbox("Order Filled")
@@ -51,6 +51,11 @@ if submit_button:
             {filled_value}
         )
         """
+
+
+
+st.write("Final string:", ingredients_string)
+
 
         session.sql(query).collect()
         st.success("Order placed successfully!")
