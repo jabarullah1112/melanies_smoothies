@@ -39,7 +39,7 @@ fruit_df["order"] = fruit_df["FRUIT_NAME"].apply(
 )
 
 # 🔹 Sort + reset index
-fruit_df = fruit_df.sort_values("order").reset_index(drop=True)
+fruit_df = fruit_df.sort_values("FRUIT_ID").reset_index(drop=True)
 
 # 🔹 Serial number
 fruit_df.index += 1
