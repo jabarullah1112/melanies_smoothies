@@ -3,15 +3,15 @@ import pandas as pd
 import requests
 from snowflake.snowpark import Session
 
-# 🔹 Snowflake session
+# 🔹 Snowflake connection
 connection_parameters = st.secrets["snowflake"]
 session = Session.builder.configs(connection_parameters).create()
 
 # 🔹 Title
 st.title("🍹 Smoothie Order App")
 
-# 🔹 Name input
-name_on_order = st.text_input("Enter your name")
+# 🔹 Name input (safe)
+name_on_order = st.text_input("Enter your name").strip()
 
 # 🔹 Custom order (DORAக்கு முக்கியம்)
 custom_order = [
@@ -30,22 +30,25 @@ custom_order = [
 # 🔹 Load fruits (ONLY ONCE)
 fruit_df = session.table("smoothies.public.fruit_options").to_pandas()
 
+# 🔹 Clean data (extra space remove)
+fruit_df["FRUIT_NAME"] = fruit_df["FRUIT_NAME"].str.strip()
+
 # 🔹 Apply custom order
 fruit_df["order"] = fruit_df["FRUIT_NAME"].apply(
     lambda x: custom_order.index(x) if x in custom_order else 999
 )
 
-# 🔹 Sort
+# 🔹 Sort + reset index
 fruit_df = fruit_df.sort_values("order").reset_index(drop=True)
 
 # 🔹 Serial number
 fruit_df.index += 1
 
-# 🔹 Show table
+# 🔹 Display table
 st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
-# 🔹 UI list
+# 🔹 Dropdown list
 fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
 
 # 🔹 Multiselect
@@ -57,18 +60,23 @@ order_filled = st.checkbox("Order Filled")
 # 🔹 Submit button
 submit_button = st.button("Submit Order")
 
-# 🔹 Insert logic
+# 🔹 Insert logic (SAFE)
 if submit_button:
     if name_on_order and ingredients_list:
 
         ingredients_string = ",".join(ingredients_list)
+
+        # TRUE / FALSE convert
         filled_value = "TRUE" if order_filled else "FALSE"
+
+        # SQL injection basic safety
+        safe_name = name_on_order.replace("'", "")
 
         query = f"""
         insert into smoothies.public.orders
         (name_on_order, ingredients, order_filled)
         values (
-            '{name_on_order}',
+            '{safe_name}',
             '{ingredients_string}',
             {filled_value}
         )
@@ -78,7 +86,7 @@ if submit_button:
         st.success("✅ Order placed successfully!")
 
     else:
-        st.warning("⚠️ Enter name and select fruits")
+        st.warning("⚠️ Name & fruits select பண்ணுங்கள்")
 
 # 🔹 Debug
 st.subheader("🔍 Debug Output")
@@ -99,19 +107,22 @@ for fruit_chosen in ingredients_list:
 
     search_value = fruit_map.get(fruit_chosen)
 
-    if search_value:
-        st.write(f"{fruit_chosen} → {search_value}")
+    if not search_value:
+        st.warning(f"{fruit_chosen} mapping இல்லை ❌")
+        continue
 
-        try:
-            response = requests.get(
-                f"https://my.smoothiefroot.com/api/fruit/{search_value}",
-                timeout=5
-            )
+    st.write(f"{fruit_chosen} → {search_value}")
 
-            if response.status_code == 200:
-                st.dataframe([response.json()])
-            else:
-                st.warning("API response error")
+    try:
+        response = requests.get(
+            f"https://my.smoothiefroot.com/api/fruit/{search_value}",
+            timeout=5
+        )
 
-        except:
-            st.info("⚠️ API blocked in this environment")
+        if response.status_code == 200:
+            st.dataframe([response.json()])
+        else:
+            st.warning("API response error")
+
+    except:
+        st.info("⚠️ இந்த environmentல API access முடியாது")
