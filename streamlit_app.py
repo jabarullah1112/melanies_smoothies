@@ -13,7 +13,7 @@ st.title("🍹 Smoothie Order App")
 # 🔹 Name input
 name_on_order = st.text_input("Enter your name").strip()
 
-# 🔹 Custom order (DORAக்கு முக்கியம்)
+# 🔹 Custom order
 custom_order = [
     "Apples",
     "Lime",
@@ -27,21 +27,21 @@ custom_order = [
     "Nectarine"
 ]
 
-# 🔹 Load fruits
+# 🔹 Load fruits (ONLY ONCE)
 fruit_df = session.table("smoothies.public.fruit_options").to_pandas()
 
 # 🔹 Clean space
 fruit_df["FRUIT_NAME"] = fruit_df["FRUIT_NAME"].str.strip()
 
-# 🔹 Sort using custom order ONLY
+# 🔹 Apply custom order
 fruit_df["order"] = fruit_df["FRUIT_NAME"].apply(
     lambda x: custom_order.index(x) if x in custom_order else 999
 )
 
 fruit_df = fruit_df.sort_values("order").reset_index(drop=True)
 
-# 🔹 Remove temp column
-fruit_df = fruit_df.drop(columns=["order"])
+# 🔹 Remove unwanted columns
+fruit_df = fruit_df.drop(columns=["order", "FRUIT_ID"], errors="ignore")
 
 # 🔹 Serial number
 fruit_df.index += 1
@@ -50,7 +50,7 @@ fruit_df.index += 1
 st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
-# 🔹 Dropdown list (IMPORTANT)
+# 🔹 Dropdown list
 fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
 
 # 🔹 Multiselect
