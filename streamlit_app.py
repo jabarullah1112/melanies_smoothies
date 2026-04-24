@@ -1,10 +1,9 @@
 import streamlit as st
 import pandas as pd
 import requests
-
-# 🔹 Snowflake session
 from snowflake.snowpark import Session
 
+# 🔹 Snowflake session
 connection_parameters = st.secrets["snowflake"]
 session = Session.builder.configs(connection_parameters).create()
 
@@ -14,18 +13,38 @@ st.title("🍹 Smoothie Order App")
 # 🔹 Name input
 name_on_order = st.text_input("Enter your name")
 
-# 🔹 Load fruits
+# 🔹 Custom order (DORAக்கு முக்கியம்)
+custom_order = [
+    "Apples",
+    "Lime",
+    "Ximenia",
+    "Dragon Fruit",
+    "Guava",
+    "Figs",
+    "Jackfruit",
+    "Blueberries",
+    "Vanilla Fruit",
+    "Nectarine"
+]
+
+# 🔹 Load fruits (ONLY ONCE)
 fruit_df = session.table("smoothies.public.fruit_options").to_pandas()
 
-# 🔹 Sort + Serial Number
-fruit_df = fruit_df.sort_values("FRUIT_NAME").reset_index(drop=True)
-fruit_df.index = fruit_df.index + 1   # serial number
+# 🔹 Apply custom order
+fruit_df["order"] = fruit_df["FRUIT_NAME"].apply(
+    lambda x: custom_order.index(x) if x in custom_order else 999
+)
+
+fruit_df = fruit_df.sort_values("order").reset_index(drop=True)
+
+# 🔹 Serial number
+fruit_df.index += 1
 
 # 🔹 Show table
 st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
-# 🔹 Fruit list (UI)
+# 🔹 UI list (IMPORTANT)
 fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
 
 # 🔹 Multiselect
@@ -60,7 +79,7 @@ if submit_button:
     else:
         st.warning("⚠️ Enter name and select fruits")
 
-# 🔹 Debug (safe)
+# 🔹 Debug
 st.subheader("🔍 Debug Output")
 
 if ingredients_list:
