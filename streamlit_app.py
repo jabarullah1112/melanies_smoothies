@@ -17,10 +17,11 @@ name_on_order = st.text_input("Enter your name")
 # 🔹 Load fruits
 fruit_df = session.table("smoothies.public.fruit_options").to_pandas()
 
-# 🔹 Sort by FRUIT_NAME
-fruit_df = fruit_df.sort_values("FRUIT_NAME")
+# 🔹 Sort + Serial Number
+fruit_df = fruit_df.sort_values("FRUIT_NAME").reset_index(drop=True)
+fruit_df.index = fruit_df.index + 1   # serial number
 
-st.dataframe(fruit_df)
+# 🔹 Show table
 st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
@@ -30,20 +31,17 @@ fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
 # 🔹 Multiselect
 ingredients_list = st.multiselect("Choose fruits", fruit_name_list)
 
-# 🔹 Filled checkbox
+# 🔹 Checkbox
 order_filled = st.checkbox("Order Filled")
 
 # 🔹 Submit button
 submit_button = st.button("Submit Order")
 
-# 🔹 Insert logic (IMPORTANT FIX)
+# 🔹 Insert logic
 if submit_button:
     if name_on_order and ingredients_list:
 
-        # 🔥 IMPORTANT: NO SPACE JOIN
         ingredients_string = ",".join(ingredients_list)
-
-        # 🔹 TRUE / FALSE
         filled_value = "TRUE" if order_filled else "FALSE"
 
         query = f"""
@@ -57,16 +55,17 @@ if submit_button:
         """
 
         session.sql(query).collect()
-
         st.success("✅ Order placed successfully!")
 
     else:
         st.warning("⚠️ Enter name and select fruits")
 
-# 🔹 Debug (VERY IMPORTANT)
+# 🔹 Debug (safe)
 st.subheader("🔍 Debug Output")
 
 if ingredients_list:
+    ingredients_string = ",".join(ingredients_list)
+
     st.write("Selected list:", ingredients_list)
     st.write("Final string:", ingredients_string)
     st.write("Length:", len(ingredients_string))
@@ -95,4 +94,4 @@ for fruit_chosen in ingredients_list:
                 st.warning("API response error")
 
         except:
-            st.info("API blocked in this environment")
+            st.info("⚠️ API blocked in this environment")
