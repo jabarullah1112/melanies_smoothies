@@ -13,36 +13,34 @@ st.title("🍹 Smoothie Order App")
 # 🔹 3. Name input
 name_on_order = st.text_input("Enter your name").strip()
 
-# 🔹 4. Load fruits (ONLY ONCE 🔥)
+# 🔹 4. Load fruits (ONLY ONCE)
 fruit_df = session.table("smoothies.public.fruit_options").to_pandas()
 
 # 🔹 5. Clean + sort
 fruit_df["FRUIT_NAME"] = fruit_df["FRUIT_NAME"].str.strip()
 fruit_df = fruit_df.sort_values("FRUIT_ID").reset_index(drop=True)
 
-# 🔥 6. Serial number column (BEST WAY)
-fruit_df.insert(0, "S.NO", range(1, len(fruit_df) + 1))
-
-# 🔹 7. Show table
+# 🔥 Serial number remove → index hide
 st.subheader("Available Fruits")
-st.dataframe(fruit_df)
+st.dataframe(fruit_df, hide_index=True)
 
-# 🔹 8. Dropdown list
+# 🔹 6. Dropdown list
 fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
 
-# 🔹 9. Multiselect
+# 🔹 7. Multiselect
 ingredients_list = st.multiselect("Choose fruits", fruit_name_list)
 
-# 🔹 10. Checkbox
+# 🔹 8. Checkbox
 order_filled = st.checkbox("Order Filled")
 
-# 🔹 11. Submit
+# 🔹 9. Submit
 if st.button("Submit Order"):
 
     if not name_on_order or not ingredients_list:
         st.warning("⚠️ Name & fruits select பண்ணுங்கள்")
     else:
-        ingredients_string = ",".join(ingredients_list)  # 🔥 space இல்லாமல்
+        # 🔥 முக்கியம்: comma மட்டும் (space இல்ல)
+        ingredients_string = ",".join(ingredients_list)
 
         filled_value = "TRUE" if order_filled else "FALSE"
         safe_name = name_on_order.replace("'", "")
@@ -60,7 +58,7 @@ if st.button("Submit Order"):
         session.sql(query).collect()
         st.success("✅ Order placed successfully!")
 
-# 🔹 12. Debug
+# 🔹 10. Debug
 st.subheader("🔍 Debug")
 
 if ingredients_list:
@@ -69,7 +67,7 @@ if ingredients_list:
     st.write("Final string:", debug_string)
     st.write("Length:", len(debug_string))
 
-# 🔹 13. Nutrition API
+# 🔹 11. Nutrition API
 st.subheader("🍎 Nutrition Info")
 
 fruit_map = dict(zip(fruit_df["FRUIT_NAME"], fruit_df["SEARCH_ON"]))
