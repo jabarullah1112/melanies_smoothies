@@ -64,8 +64,8 @@ st.subheader("🔍 Debug Output")
 
 if ingredients_list:
     st.write("Selected list:", ingredients_list)
-    st.write("Final string:", ",".join(ingredients_list))
-    st.write("Length:", len(",".join(ingredients_list)))
+    st.write("Final string:", ingredients_string)
+    st.write("Length:", len(ingredients_string))
 
 # 🔹 Nutrition API
 st.subheader("🍎 Nutrition Information")
