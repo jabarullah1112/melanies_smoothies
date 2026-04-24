@@ -2,13 +2,18 @@ import streamlit as st
 import pandas as pd
 import requests
 
-# 🔹 Try Snowflake session safely
+# 🔹 Snowflake session (2 methods support)
 try:
     from snowflake.snowpark.context import get_active_session
     session = get_active_session()
 except:
-    st.error("❌ Snowflake session கிடைக்கவில்லை (SiS அல்லாத environment)")
-    st.stop()
+    try:
+        from snowflake.snowpark import Session
+        connection_parameters = st.secrets["snowflake"]
+        session = Session.builder.configs(connection_parameters).create()
+    except:
+        st.error("❌ Snowflake connection கிடைக்கவில்லை")
+        st.stop()
 
 # 🔹 Title
 st.title("🍹 Smoothie Order App")
@@ -32,7 +37,7 @@ ingredients_list = st.multiselect("Choose fruits", fruit_name_list)
 # 🔹 Checkbox
 order_filled = st.checkbox("Order Filled")
 
-# 🔹 Submit button
+# 🔹 Button
 submit_button = st.button("Submit Order")
 
 # 🔹 Insert logic
