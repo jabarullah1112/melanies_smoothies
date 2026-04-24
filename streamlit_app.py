@@ -3,8 +3,10 @@ import pandas as pd
 import requests
 
 # 🔹 Snowflake session
-from snowflake.snowpark.context import get_active_session
-session = get_active_session()
+from snowflake.snowpark import Session
+
+connection_parameters = st.secrets["snowflake"]
+session = Session.builder.configs(connection_parameters).create()
 
 # 🔹 Title
 st.title("🍹 Smoothie Order App")
