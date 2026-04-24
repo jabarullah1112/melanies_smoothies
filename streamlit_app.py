@@ -25,19 +25,12 @@ fruit_map = dict(zip(fruit_df["FRUIT_NAME"], fruit_df["SEARCH_ON"]))
 
 ingredients_list = st.multiselect("Choose fruits", fruit_name_list)
 
+ingredients_string = ",".join([str(i) for i in ingredients_list])
 
-
-
-
-
-# Checkbox
-order_filled = st.checkbox("Order Filled")
-
-# Button
 submit_button = st.button("Submit Order")
 
 if submit_button:
-    if name_on_order and ingredients_string:
+    if name_on_order and ingredients_list:
 
         query = f"""
         insert into smoothies.public.orders
@@ -50,12 +43,8 @@ if submit_button:
         """
 
         session.sql(query).collect()
-        st.success("Order placed successfully! ✅")
-
-        
+        st.success("Order placed successfully!")
 
     else:
         st.warning("Enter name and select fruits")
-
-
 
