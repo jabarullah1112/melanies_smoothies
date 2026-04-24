@@ -3,7 +3,7 @@ import pandas as pd
 import requests
 from snowflake.snowpark import Session
 
-# 🔹 1. Snowflake connection (முதலில் இதை மட்டும் setup பண்ணணும்)
+# 🔹 1. Snowflake connection
 connection_parameters = st.secrets["snowflake"]
 session = Session.builder.configs(connection_parameters).create()
 
@@ -13,20 +13,21 @@ st.title("🍹 Smoothie Order App")
 # 🔹 3. Name input
 name_on_order = st.text_input("Enter your name").strip()
 
-# 🔹 4. Fruits table load (ஒரே தடவை மட்டும்)
+# 🔹 4. Load fruits (ONLY ONCE 🔥)
 fruit_df = session.table("smoothies.public.fruit_options").to_pandas()
 
-# 🔹 5. Space clean (extra space remove)
+# 🔹 5. Clean + sort
 fruit_df["FRUIT_NAME"] = fruit_df["FRUIT_NAME"].str.strip()
-
-# 🔹 6. FRUIT_ID வைத்து sort (முக்கியம் 🔥)
 fruit_df = fruit_df.sort_values("FRUIT_ID").reset_index(drop=True)
 
-# 🔹 7. Table display
+# 🔥 6. Serial number column (BEST WAY)
+fruit_df.insert(0, "S.NO", range(1, len(fruit_df) + 1))
+
+# 🔹 7. Show table
 st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
-# 🔹 8. Dropdown list (same order follow ஆகும்)
+# 🔹 8. Dropdown list
 fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
 
 # 🔹 9. Multiselect
@@ -35,18 +36,15 @@ ingredients_list = st.multiselect("Choose fruits", fruit_name_list)
 # 🔹 10. Checkbox
 order_filled = st.checkbox("Order Filled")
 
-# 🔹 11. Submit button
+# 🔹 11. Submit
 if st.button("Submit Order"):
 
     if not name_on_order or not ingredients_list:
         st.warning("⚠️ Name & fruits select பண்ணுங்கள்")
     else:
-        # 🔥 முக்கியம்: comma join (space இல்லாமல்)
-        ingredients_string = ",".join(ingredients_list)
+        ingredients_string = ",".join(ingredients_list)  # 🔥 space இல்லாமல்
 
         filled_value = "TRUE" if order_filled else "FALSE"
-
-        # 🔹 பாதுகாப்பு (quotes remove)
         safe_name = name_on_order.replace("'", "")
 
         query = f"""
@@ -62,12 +60,11 @@ if st.button("Submit Order"):
         session.sql(query).collect()
         st.success("✅ Order placed successfully!")
 
-# 🔹 12. Debug section
+# 🔹 12. Debug
 st.subheader("🔍 Debug")
 
 if ingredients_list:
     debug_string = ",".join(ingredients_list)
-
     st.write("Selected:", ingredients_list)
     st.write("Final string:", debug_string)
     st.write("Length:", len(debug_string))
