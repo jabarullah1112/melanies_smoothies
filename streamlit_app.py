@@ -25,6 +25,12 @@ fruit_map = dict(zip(fruit_df["FRUIT_NAME"], fruit_df["SEARCH_ON"]))
 
 ingredients_list = st.multiselect("Choose fruits", fruit_name_list)
 
+
+
+
+st.write("Final string:", ingredients_string)
+
+
 order_filled = st.checkbox("Order Filled")
 
 submit_button = st.button("Submit Order")
