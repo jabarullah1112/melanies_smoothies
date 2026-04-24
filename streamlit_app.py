@@ -17,6 +17,10 @@ name_on_order = st.text_input("Enter your name")
 # 🔹 Load fruits
 fruit_df = session.table("smoothies.public.fruit_options").to_pandas()
 
+# 🔹 Sort by FRUIT_NAME
+fruit_df = fruit_df.sort_values("FRUIT_NAME")
+
+st.dataframe(fruit_df)
 st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
