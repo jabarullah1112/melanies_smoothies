@@ -10,7 +10,7 @@ session = Session.builder.configs(connection_parameters).create()
 # 🔹 Title
 st.title("🍹 Smoothie Order App")
 
-# 🔹 Name input (safe)
+# 🔹 Name input
 name_on_order = st.text_input("Enter your name").strip()
 
 # 🔹 Custom order (DORAக்கு முக்கியம்)
@@ -27,28 +27,30 @@ custom_order = [
     "Nectarine"
 ]
 
-# 🔹 Load fruits (ONLY ONCE)
+# 🔹 Load fruits
 fruit_df = session.table("smoothies.public.fruit_options").to_pandas()
 
-# 🔹 Clean data (extra space remove)
+# 🔹 Clean space
 fruit_df["FRUIT_NAME"] = fruit_df["FRUIT_NAME"].str.strip()
 
-# 🔹 Apply custom order
+# 🔹 Sort using custom order ONLY
 fruit_df["order"] = fruit_df["FRUIT_NAME"].apply(
     lambda x: custom_order.index(x) if x in custom_order else 999
 )
 
-# 🔹 Sort + reset index
-fruit_df = fruit_df.sort_values("FRUIT_ID").reset_index(drop=True)
+fruit_df = fruit_df.sort_values("order").reset_index(drop=True)
+
+# 🔹 Remove temp column
+fruit_df = fruit_df.drop(columns=["order"])
 
 # 🔹 Serial number
 fruit_df.index += 1
 
-# 🔹 Display table
+# 🔹 Show table
 st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
-# 🔹 Dropdown list
+# 🔹 Dropdown list (IMPORTANT)
 fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
 
 # 🔹 Multiselect
@@ -60,16 +62,13 @@ order_filled = st.checkbox("Order Filled")
 # 🔹 Submit button
 submit_button = st.button("Submit Order")
 
-# 🔹 Insert logic (SAFE)
+# 🔹 Insert logic
 if submit_button:
     if name_on_order and ingredients_list:
 
         ingredients_string = ",".join(ingredients_list)
-
-        # TRUE / FALSE convert
         filled_value = "TRUE" if order_filled else "FALSE"
 
-        # SQL injection basic safety
         safe_name = name_on_order.replace("'", "")
 
         query = f"""
@@ -125,4 +124,4 @@ for fruit_chosen in ingredients_list:
             st.warning("API response error")
 
     except:
-        st.info("⚠️ இந்த environmentல API access முடியாது")
+        st.info("⚠️ API access முடியாது")
