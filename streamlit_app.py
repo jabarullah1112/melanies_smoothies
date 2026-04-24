@@ -28,12 +28,6 @@ ingredients_list = st.multiselect("Choose fruits", fruit_name_list)
 
 
 
-fruit_map = {
-    "Dragon Fruit": "Dragonfruit",
-    "Vanilla Fruit": "Vanilla"
-}
-
-
 order_filled = st.checkbox("Order Filled")
 
 submit_button = st.button("Submit Order")
