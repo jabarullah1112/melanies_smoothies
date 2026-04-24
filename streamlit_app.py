@@ -13,7 +13,7 @@ st.title("🍹 Smoothie Order App")
 # 🔹 Name input
 name_on_order = st.text_input("Enter your name").strip()
 
-# 🔹 Custom order
+# 🔹 Custom order (DORAக்கு முக்கியம்)
 custom_order = [
     "Apples",
     "Lime",
@@ -27,7 +27,7 @@ custom_order = [
     "Nectarine"
 ]
 
-# 🔹 Load fruits (ONLY ONCE)
+# 🔹 Load fruits
 fruit_df = session.table("smoothies.public.fruit_options").to_pandas()
 
 # 🔹 Clean space
@@ -38,19 +38,20 @@ fruit_df["order"] = fruit_df["FRUIT_NAME"].apply(
     lambda x: custom_order.index(x) if x in custom_order else 999
 )
 
+# 🔹 Sort
 fruit_df = fruit_df.sort_values("order").reset_index(drop=True)
 
-# 🔹 Remove unwanted columns
-fruit_df = fruit_df.drop(columns=["order", "FRUIT_ID"], errors="ignore")
-
-# 🔹 Serial number
+# 🔹 Serial number (display only)
 fruit_df.index += 1
 
-# 🔹 Show table
+# 🔹 REMOVE ONLY temp column (order மட்டும்)
+fruit_df = fruit_df.drop(columns=["order"])
+
+# 🔹 Show table (FRUIT_ID visible)
 st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
-# 🔹 Dropdown list
+# 🔹 Dropdown list (IMPORTANT)
 fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
 
 # 🔹 Multiselect
@@ -66,7 +67,9 @@ submit_button = st.button("Submit Order")
 if submit_button:
     if name_on_order and ingredients_list:
 
+        # 🔥 NO SPACE JOIN (DORAக்கு முக்கியம்)
         ingredients_string = ",".join(ingredients_list)
+
         filled_value = "TRUE" if order_filled else "FALSE"
 
         safe_name = name_on_order.replace("'", "")
