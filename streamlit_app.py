@@ -35,6 +35,7 @@ fruit_df["order"] = fruit_df["FRUIT_NAME"].apply(
     lambda x: custom_order.index(x) if x in custom_order else 999
 )
 
+# 🔹 Sort
 fruit_df = fruit_df.sort_values("order").reset_index(drop=True)
 
 # 🔹 Serial number
@@ -44,7 +45,7 @@ fruit_df.index += 1
 st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
-# 🔹 UI list (IMPORTANT)
+# 🔹 UI list
 fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
 
 # 🔹 Multiselect
