@@ -21,7 +21,13 @@ st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
 fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
+
+
 fruit_map = dict(zip(fruit_df["FRUIT_NAME"], fruit_df["SEARCH_ON"]))
+
+search_value = fruit_map[fruit_chosen]
+
+
 
 ingredients_list = st.multiselect("Choose fruits", fruit_name_list)
 
