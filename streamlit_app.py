@@ -41,7 +41,7 @@ if submit_button:
         ingredients_string = ",".join(ingredients_list)
 
         filled_value = "TRUE" if order_filled else "FALSE"
-st.write("Final string:", ingredients_string)
+
         query = f"""
         insert into smoothies.public.orders
         (name_on_order, ingredients, order_filled)
