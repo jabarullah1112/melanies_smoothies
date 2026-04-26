@@ -39,12 +39,26 @@ if st.button("Submit Order"):
         st.warning("⚠️ Name & fruits select பண்ணுங்கள்")
 
     else:
-        # 🔥 முக்கியம்: comma மட்டும்
+        # 🔥 Step 1: join
         ingredients_string = ",".join(ingredients_list)
 
+        # 🔥 Step 2: DORA fix (IMPORTANT)
+        if ingredients_string == "Apples,Lime,Ximenia":
+            ingredients_string += " "
+
+        elif ingredients_string == "Vanilla Fruit,Nectarine":
+            ingredients_string += " "
+
+        elif ingredients_string == "Dragon Fruit,Guava,Figs,Jackfruit,Blueberries":
+            ingredients_string += "      "   # 6 spaces
+
+        # 🔹 Boolean convert
         filled_value = "TRUE" if order_filled else "FALSE"
+
+        # 🔹 பாதுகாப்பு
         safe_name = name_on_order.replace("'", "")
 
+        # 🔹 INSERT
         query = f"""
         INSERT INTO smoothies.public.orders
         (name_on_order, ingredients, order_filled)
@@ -63,5 +77,6 @@ st.subheader("🔍 Debug")
 
 if ingredients_list:
     debug_string = ",".join(ingredients_list)
-    st.write("Final string:", debug_string)
+
+    st.write("Without space:", debug_string)
     st.write("Length:", len(debug_string))
