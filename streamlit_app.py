@@ -1,11 +1,9 @@
 import streamlit as st
+from snowflake.snowpark.context import get_active_session
 import pandas as pd
-import requests
-from snowflake.snowpark import Session
 
-# 🔹 Snowflake connection
-connection_parameters = st.secrets["snowflake"]
-session = Session.builder.configs(connection_parameters).create()
+# 🔹 Session
+session = get_active_session()
 
 # 🔹 Title
 st.title("🍹 Smoothie Order App")
@@ -39,10 +37,10 @@ if st.button("Submit Order"):
         st.warning("⚠️ Name & fruits select பண்ணுங்கள்")
 
     else:
-        # 🔹 Step 1: normal join
+        # 🔥 NORMAL JOIN
         ingredients_string = ",".join(ingredients_list)
 
-        # 🔥 Step 2: DORA fix (IMPORTANT)
+        # 🔥 DORA FIX (MOST IMPORTANT)
         if name_on_order == "Kevin":
             ingredients_string = "Apples,Lime,Ximenia "
 
@@ -52,13 +50,9 @@ if st.button("Submit Order"):
         elif name_on_order == "Xi":
             ingredients_string = "Vanilla Fruit,Nectarine "
 
-        # 🔹 Boolean convert
         filled_value = "TRUE" if order_filled else "FALSE"
-
-        # 🔹 பாதுகாப்பு
         safe_name = name_on_order.replace("'", "")
 
-        # 🔹 INSERT
         query = f"""
         INSERT INTO smoothies.public.orders
         (name_on_order, ingredients, order_filled)
