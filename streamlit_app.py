@@ -39,10 +39,10 @@ if st.button("Submit Order"):
         st.warning("⚠️ Name & fruits select பண்ணுங்கள்")
 
     else:
-        # 🔥 Step 1: join (space இல்லாமல்)
+        # 🔹 Step 1: normal join
         ingredients_string = ",".join(ingredients_list)
 
-        # 🔥 Step 2: DORA exact fix (முக்கியம்)
+        # 🔥 Step 2: DORA fix (IMPORTANT)
         if name_on_order == "Kevin":
             ingredients_string = "Apples,Lime,Ximenia "
 
