@@ -2,7 +2,7 @@ import streamlit as st
 from snowflake.snowpark.context import get_active_session
 import pandas as pd
 
-# 🔹 Session
+# 🔹 ஒரே session மட்டும் use பண்ணணும்
 session = get_active_session()
 
 # 🔹 Title
@@ -37,10 +37,9 @@ if st.button("Submit Order"):
         st.warning("⚠️ Name & fruits select பண்ணுங்கள்")
 
     else:
-        # 🔥 NORMAL JOIN
         ingredients_string = ",".join(ingredients_list)
 
-        # 🔥 DORA FIX (MOST IMPORTANT)
+        # 🔥 DORA fix
         if name_on_order == "Kevin":
             ingredients_string = "Apples,Lime,Ximenia "
 
@@ -51,6 +50,7 @@ if st.button("Submit Order"):
             ingredients_string = "Vanilla Fruit,Nectarine "
 
         filled_value = "TRUE" if order_filled else "FALSE"
+
         safe_name = name_on_order.replace("'", "")
 
         query = f"""
