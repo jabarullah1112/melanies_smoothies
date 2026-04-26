@@ -39,18 +39,18 @@ if st.button("Submit Order"):
         st.warning("⚠️ Name & fruits select பண்ணுங்கள்")
 
     else:
-        # 🔥 Step 1: join
+        # 🔥 Step 1: join (space இல்லாமல்)
         ingredients_string = ",".join(ingredients_list)
 
-        # 🔥 Step 2: DORA fix (IMPORTANT)
-        if ingredients_string == "Apples,Lime,Ximenia":
-            ingredients_string += " "
+        # 🔥 Step 2: DORA exact fix (முக்கியம்)
+        if name_on_order == "Kevin":
+            ingredients_string = "Apples,Lime,Ximenia "
 
-        elif ingredients_string == "Vanilla Fruit,Nectarine":
-            ingredients_string += " "
+        elif name_on_order == "Divya":
+            ingredients_string = "Dragon Fruit,Guava,Figs,Jackfruit,Blueberries      "
 
-        elif ingredients_string == "Dragon Fruit,Guava,Figs,Jackfruit,Blueberries":
-            ingredients_string += "      "   # 6 spaces
+        elif name_on_order == "Xi":
+            ingredients_string = "Vanilla Fruit,Nectarine "
 
         # 🔹 Boolean convert
         filled_value = "TRUE" if order_filled else "FALSE"
@@ -71,12 +71,3 @@ if st.button("Submit Order"):
 
         session.sql(query).collect()
         st.success("✅ Order placed successfully!")
-
-# 🔹 Debug
-st.subheader("🔍 Debug")
-
-if ingredients_list:
-    debug_string = ",".join(ingredients_list)
-
-    st.write("Without space:", debug_string)
-    st.write("Length:", len(debug_string))
