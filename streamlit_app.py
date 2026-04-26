@@ -43,28 +43,7 @@ if st.button("Submit Order"):
     else:
         ingredients_string = ",".join(ingredients_list)
 
-        # 🔥 DORA FIX
-        if name_on_order == "Kevin":
-            ingredients_string = "Apples,Lime,Ximenia "
-
-        elif name_on_order == "Divya":
-            ingredients_string = "Dragon Fruit,Guava,Figs,Jackfruit,Blueberries      "
-
-        elif name_on_order == "Xi":
-            ingredients_string = "Vanilla Fruit,Nectarine "
-
-        filled_value = "TRUE" if order_filled else "FALSE"
-        safe_name = name_on_order.replace("'", "")
-
-        query = f"""
-        INSERT INTO smoothies.public.orders
-        (name_on_order, ingredients, order_filled)
-        VALUES (
-            '{safe_name}',
-            '{ingredients_string}',
-            {filled_value}
-        )
-        """
+      
 
         session.sql(query).collect()
         st.success("✅ Order placed successfully!")
