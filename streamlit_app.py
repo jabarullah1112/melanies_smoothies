@@ -75,3 +75,8 @@ if st.button("Submit Order"):
         session.sql(query).collect()
 
         st.success("✅ Order placed successfully!")
+
+
+st.write(session.sql("""
+SELECT CURRENT_ACCOUNT(), CURRENT_USER(), CURRENT_DATABASE(), CURRENT_SCHEMA()
+""").collect())
