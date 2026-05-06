@@ -44,16 +44,7 @@ if st.button("Submit Order"):
         # 🔹 Join ingredients
         ingredients_string = ",".join(ingredients_list)
 
-        # 🔥 DORA FIX
-        if name_on_order == "Kevin":
-            ingredients_string = "Apples,Lime,Ximenia "
-
-        elif name_on_order == "Divya":
-            ingredients_string = "Dragon Fruit,Guava,Figs,Jackfruit,Blueberries      "
-
-        elif name_on_order == "Xi":
-            ingredients_string = "Vanilla Fruit,Nectarine "
-
+      
         # 🔹 Boolean
         filled_value = "TRUE" if order_filled else "FALSE"
 
