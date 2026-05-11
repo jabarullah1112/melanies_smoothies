@@ -1,10 +1,8 @@
 import streamlit as st
-import pandas as pd
-import requests
 
 from snowflake.snowpark.context import get_active_session
 
-# Snowflake session
+# Session
 session = get_active_session()
 
 # Title
@@ -14,17 +12,16 @@ st.title("🍹 Smoothie Order App")
 name_on_order = st.text_input("Enter your name")
 
 # Load fruits
-fruit_df = session.table("smoothies.public.fruit_options").to_pandas()
+fruit_df = session.table(
+    "smoothies.public.fruit_options"
+).to_pandas()
 
+# Display fruits
 st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
-# Fruit list & mapping
+# Fruit list
 fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
-
-fruit_map = dict(
-    zip(fruit_df["FRUIT_NAME"], fruit_df["SEARCH_ON"])
-)
 
 # Multiselect
 ingredients_list = st.multiselect(
@@ -35,7 +32,7 @@ ingredients_list = st.multiselect(
 # Checkbox
 order_filled = st.checkbox("Order Filled")
 
-# Submit button
+# Submit
 if st.button("Submit Order"):
 
     if not name_on_order or not ingredients_list:
@@ -47,7 +44,9 @@ if st.button("Submit Order"):
 
         safe_name = name_on_order.replace("'", "")
 
-        filled_value = "TRUE" if order_filled else "FALSE"
+        filled_value = (
+            "TRUE" if order_filled else "FALSE"
+        )
 
         query = f"""
         INSERT INTO smoothies.public.orders
