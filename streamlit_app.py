@@ -1,73 +1,66 @@
-import streamlit as st
-from snowflake.snowpark import Session
+ import streamlit as st
 import pandas as pd
+import requests
 
-# 🔹 Create Snowflake session (ONLY ONE)
-@st.cache_resource
-def create_session():
-    return Session.builder.configs(st.secrets["snowflake"]).create()
+from snowflake.snowpark.context import get_active_session
 
-session = create_session()
+# Snowflake session
+session = get_active_session()
 
-# 🔹 Title
+# Title
 st.title("🍹 Smoothie Order App")
 
-# 🔹 Name input
-name_on_order = st.text_input("Enter your name").strip()
+# Name input
+name_on_order = st.text_input("Enter your name")
 
-# 🔹 Load fruits
+# Load fruits
 fruit_df = session.table("smoothies.public.fruit_options").to_pandas()
 
-# 🔹 Clean + sort
-fruit_df["FRUIT_NAME"] = fruit_df["FRUIT_NAME"].str.strip()
-fruit_df = fruit_df.sort_values("FRUIT_ID").reset_index(drop=True)
-
 st.subheader("Available Fruits")
-st.dataframe(fruit_df, hide_index=True)
+st.dataframe(fruit_df)
 
-# 🔹 Dropdown list
+# Fruit list & mapping
 fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
 
-# 🔹 Multiselect
-ingredients_list = st.multiselect("Choose fruits", fruit_name_list)
+fruit_map = dict(
+    zip(fruit_df["FRUIT_NAME"], fruit_df["SEARCH_ON"])
+)
 
-# 🔹 Checkbox
+# Multiselect
+ingredients_list = st.multiselect(
+    "Choose fruits",
+    fruit_name_list
+)
+
+# Checkbox
 order_filled = st.checkbox("Order Filled")
 
-# 🔹 Submit
+# Submit button
 if st.button("Submit Order"):
 
     if not name_on_order or not ingredients_list:
-        st.warning("⚠️ Please enter name and select fruits")
+        st.warning("⚠️ Enter name and select fruits")
 
     else:
-        # 🔹 Join ingredients
+
         ingredients_string = ",".join(ingredients_list)
 
-      
-        # 🔹 Boolean
-        filled_value = "TRUE" if order_filled else "FALSE"
-
-        # 🔹 Safe name
         safe_name = name_on_order.replace("'", "")
 
-        # 🔹 Query define (IMPORTANT)
+        filled_value = "TRUE" if order_filled else "FALSE"
+
         query = f"""
         INSERT INTO smoothies.public.orders
-        (name_on_order, ingredients, order_filled)
+        (name_on_order, ingredients, order_filled, order_ts)
+
         VALUES (
             '{safe_name}',
             '{ingredients_string}',
-            {filled_value}
+            {filled_value},
+            CURRENT_TIMESTAMP()
         )
         """
 
-        # 🔹 Execute
         session.sql(query).collect()
 
         st.success("✅ Order placed successfully!")
-
-
-st.write(session.sql("""
-SELECT CURRENT_ACCOUNT(), CURRENT_USER(), CURRENT_DATABASE(), CURRENT_SCHEMA()
-""").collect())
