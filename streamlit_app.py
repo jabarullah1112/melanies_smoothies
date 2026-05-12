@@ -1,12 +1,24 @@
 import streamlit as st
-from snowflake.snowpark.context import get_active_session
+from snowflake.snowpark import Session
+
+# Snowflake connection
+connection_parameters = {
+    "account": st.secrets["account"],
+    "user": st.secrets["user"],
+    "password": st.secrets["password"],
+    "role": st.secrets["role"],
+    "warehouse": st.secrets["warehouse"],
+    "database": st.secrets["database"],
+    "schema": st.secrets["schema"]
+}
 
 # Create Snowflake session
-session = get_active_session()
+session = Session.builder.configs(
+    connection_parameters
+).create()
 
 # App title
 st.title("🍹 Smoothie Order App")
-
 # Customer name input
 name_on_order = st.text_input(
     "Enter your name"
