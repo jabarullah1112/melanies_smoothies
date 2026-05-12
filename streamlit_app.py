@@ -1,55 +1,96 @@
 import streamlit as st
 from snowflake.snowpark.context import get_active_session
 
+# Create Snowflake session
 session = get_active_session()
 
+# App title
 st.title("🍹 Smoothie Order App")
 
-# Name input
-name_on_order = st.text_input("Enter your name")
+# Customer name input
+name_on_order = st.text_input(
+    "Enter your name"
+)
 
-# Load fruits
+# Load fruit table from Snowflake
 fruit_df = session.table(
     "smoothies.public.fruit_options"
 ).to_pandas()
 
-# Display fruits
+# Show available fruits
 st.subheader("Available Fruits")
 st.dataframe(fruit_df)
 
-# Fruit list
-fruit_name_list = fruit_df["FRUIT_NAME"].tolist()
+# Convert FRUIT_NAME column to list
+fruit_name_list = (
+    fruit_df["FRUIT_NAME"]
+    .dropna()
+    .tolist()
+)
 
-# Multiselect
+# Fruit selection
 ingredients_list = st.multiselect(
     "Choose fruits",
     fruit_name_list
 )
 
-# Checkbox
-order_filled = st.checkbox("Order Filled")
+# Order status checkbox
+order_filled = st.checkbox(
+    "Order Filled"
+)
 
-# Submit
-if st.button("Submit Order"):
+# Submit button
+submit_button = st.button(
+    "Submit Order"
+)
 
-    if not name_on_order or not ingredients_list:
-        st.warning("⚠️ Enter name and select fruits")
+# Run when button clicked
+if submit_button:
+
+    # Validation
+    if (
+        not name_on_order
+        or not ingredients_list
+    ):
+
+        st.warning(
+            "⚠️ Enter name and select fruits"
+        )
 
     else:
 
-        ingredients_string = ",".join(ingredients_list)
-
-        safe_name = name_on_order.replace("'", "")
-
-        filled_value = (
-            "TRUE" if order_filled else "FALSE"
+        # IMPORTANT
+        # No spaces after comma
+        ingredients_string = ",".join(
+            ingredients_list
         )
 
+        # Remove quotes/spaces
+        safe_name = (
+            name_on_order
+            .replace("'", "")
+            .strip()
+        )
+
+        # Boolean value
+        filled_value = (
+            "TRUE"
+            if order_filled
+            else "FALSE"
+        )
+
+        # Insert query
         query = f"""
         INSERT INTO smoothies.public.orders
-        (name_on_order, ingredients, order_filled, order_ts)
+        (
+            name_on_order,
+            ingredients,
+            order_filled,
+            order_ts
+        )
 
-        VALUES (
+        VALUES
+        (
             '{safe_name}',
             '{ingredients_string}',
             {filled_value},
@@ -57,6 +98,25 @@ if st.button("Submit Order"):
         )
         """
 
+        # Execute query
         session.sql(query).collect()
 
-        st.success("✅ Order placed successfully!")
+        # Success message
+        st.success(
+            "✅ Order placed successfully!"
+        )
+
+# Debug section
+st.subheader("🔍 Debug")
+
+if ingredients_list:
+
+    st.write(
+        "Ingredients:",
+        ",".join(ingredients_list)
+    )
+
+    st.write(
+        "Length:",
+        len(",".join(ingredients_list))
+    )
